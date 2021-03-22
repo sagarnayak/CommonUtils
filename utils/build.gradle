@@ -9,7 +9,7 @@ def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
 
 def getVersionName = { ->
-    return "0.0.2"
+    return "0.0.3"
 }
 
 def getArtificatId = { ->
@@ -84,7 +84,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     //common models and enums
-    implementation 'com.sagar:modelsandenums:0.0.4'
+    implementation 'com.sagar:modelsandenums:0.0.5'
 
     //testing
     testImplementation 'junit:junit:4.13.2'

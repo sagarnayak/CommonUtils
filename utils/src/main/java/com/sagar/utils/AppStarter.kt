@@ -18,4 +18,12 @@ class AppStarter(private val context: Context) {
         )
         context.sendBroadcast(Intent(END_SELF))
     }
+
+    fun endAll() {
+        context.sendBroadcast(
+            Intent(
+                END_SELF
+            )
+        )
+    }
 }
