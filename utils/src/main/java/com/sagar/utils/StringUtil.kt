@@ -32,7 +32,8 @@ class StringUtil {
 
         fun generatePartialClickableTextView(
             textListToOperate: ArrayList<PartialText>,
-            textViewToApplyOn: TextView
+            textViewToApplyOn: TextView,
+            selectedTextColor: Int
         ) {
             if (textListToOperate.size == 0)
                 return
@@ -45,7 +46,7 @@ class StringUtil {
                 spannableStringBuilder.append(item.textToProcess)
                 if (item.textType == CLICKABLE) {
                     spannableStringBuilder.setSpan(
-                        ClickableSpan((item as ClickableText).callback),
+                        ClickableSpan(selectedTextColor, (item as ClickableText).callback),
                         startIndex,
                         endIndex,
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -64,6 +65,7 @@ class StringUtil {
             content: String,
             stringToMakeClickable: String,
             textViewToApplyOn: TextView,
+            selectedTextColor: Int,
             callback: () -> Unit
         ) {
             if (!content.contains(stringToMakeClickable, true))
@@ -71,7 +73,7 @@ class StringUtil {
 
             val ss =
                 SpannableString(content)
-            val cs = ClickableSpan(callback)
+            val cs = ClickableSpan(selectedTextColor, callback)
             ss.setSpan(
                 cs,
                 content.indexOf(stringToMakeClickable),
@@ -131,7 +133,10 @@ class StringUtil {
 
     }
 
-    class ClickableSpan(private val callback: () -> Unit) :
+    class ClickableSpan(
+        private val selectedTextColor: Int,
+        private val callback: () -> Unit
+    ) :
         android.text.style.ClickableSpan() {
         override fun onClick(widget: View) {
             callback()
@@ -140,6 +145,7 @@ class StringUtil {
         override fun updateDrawState(ds: TextPaint) {
             super.updateDrawState(ds)
             ds.isUnderlineText = false
+            ds.color = selectedTextColor
         }
     }
 }
