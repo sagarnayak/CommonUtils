@@ -4,11 +4,14 @@ package com.sagar.utils
 
 import android.graphics.Color
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.TextView
+import com.sagar.utils.StringUtil.TextType.CLICKABLE
+import com.sagar.utils.StringUtil.TextType.NOT_CLICKABLE
 import java.util.*
 import kotlin.random.Random
 
@@ -25,6 +28,36 @@ class StringUtil {
                     sb.append(" ")
             }
             return sb.toString()
+        }
+
+        fun generatePartialClickableTextView(
+            textListToOperate: ArrayList<PartialText>,
+            textViewToApplyOn: TextView
+        ) {
+            if (textListToOperate.size == 0)
+                return
+
+            val spannableStringBuilder = SpannableStringBuilder()
+
+            textListToOperate.forEach { item ->
+                val startIndex = spannableStringBuilder.lastIndex + 1
+                val endIndex = startIndex + item.textToProcess.length
+                spannableStringBuilder.append(item.textToProcess)
+                if (item.textType == CLICKABLE) {
+                    spannableStringBuilder.setSpan(
+                        ClickableSpan((item as ClickableText).callback),
+                        startIndex,
+                        endIndex,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+            }
+
+            textViewToApplyOn.apply {
+                text = spannableStringBuilder
+                movementMethod = LinkMovementMethod.getInstance()
+                highlightColor = Color.TRANSPARENT
+            }
         }
 
         fun generatePartialClickableTextView(
@@ -63,18 +96,39 @@ class StringUtil {
                 splits.forEach { word ->
                     if (word.isNotEmpty())
                         toReturn =
-                            "$toReturn${if (toReturn.isNotEmpty()) " " else ""}${word.substring(
-                                0,
-                                1
-                            )
-                                .toUpperCase(Locale.ROOT)}${word.substring(1)}"
+                            "$toReturn${if (toReturn.isNotEmpty()) " " else ""}${
+                                word.substring(
+                                    0,
+                                    1
+                                )
+                                    .toUpperCase(Locale.ROOT)
+                            }${word.substring(1)}"
                 }
                 return toReturn
             }
 
-            return "${stringToProcess.substring(0, 1)
-                .toUpperCase(Locale.ROOT)}${stringToProcess.substring(1)}"
+            return "${
+                stringToProcess.substring(0, 1)
+                    .toUpperCase(Locale.ROOT)
+            }${stringToProcess.substring(1)}"
         }
+    }
+
+    enum class TextType {
+        CLICKABLE, NOT_CLICKABLE
+    }
+
+    abstract class PartialText(val textType: TextType, val textToProcess: String) {
+    }
+
+    class ClickableText(textToProcess: String, val callback: () -> Unit) :
+        PartialText(CLICKABLE, textToProcess) {
+
+    }
+
+    class NonClickableText(textToProcess: String) :
+        PartialText(NOT_CLICKABLE, textToProcess) {
+
     }
 
     class ClickableSpan(private val callback: () -> Unit) :
